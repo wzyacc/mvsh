@@ -6,6 +6,7 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import pymongo
 import hashlib
+from elasticsearch import Elasticsearch
 
 class Lol5SPipeline(object):
     tb_name = 'mv_records'
@@ -40,4 +41,42 @@ class Lol5SPipeline(object):
         if item["name"] != old_item["name"] or len(item["mv_plist"]) != len(old_item["mv_plist"]):
             del item['_id']
             coll.update({'_id':_id},{'$set':item})
+        return None
+
+class Lol5sESPipeline(object):
+    doc_type = 'mv_records'
+    def __init__(self,es_uri, es_index):
+        self.es_uri = es_uri
+        self.es_index = es_index
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+                es_uri = crawler.settings.get('ES_URI'),
+                es_index = crawler.settings.get('ES_INDEX','yse8') 
+            )
+
+    def open_spider(self,spider):
+        self.es = Elasticsearch()
+    
+    def close_spider(self,spider):
+        #self.es.close()
+        pass
+
+    def process_item(self, item, spider):
+        item = dict(item)
+        surl = item["surl"]
+        ml = hashlib.md5()
+        ml.update(surl.encode('utf-8'))
+        _id = ml.hexdigest()
+        try:
+            old_item = self.es.get(index=self.es_index, doc_type=self.doc_type,id=_id)
+        except Exception as e:
+            old_item = None
+            print e
+
+        if not old_item:
+            self.es.index(index=self.es_index, doc_type=self.doc_type, id=_id,body=item)
+            return item
+        if item["name"] != old_item["name"] or len(item["mv_plist"]) != len(old_item["mv_plist"]):
+            self.es.update(index=self.es_index, doc_type=self.doc_type, id=_id,body=item)
         return None

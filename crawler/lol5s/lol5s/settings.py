@@ -14,8 +14,10 @@ BOT_NAME = 'lol5s'
 SPIDER_MODULES = ['lol5s.spiders']
 NEWSPIDER_MODULE = 'lol5s.spiders'
 
-MONGO_URI = 'mongodb://10.140.0.4/yse8'
+MONGO_URI = 'mongodb://127.0.0.1/yse8'
 MONGO_DATABASE = 'yse8'
+
+ES_URI = 'http://localhost:9200'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'lol5s (+http://www.yourdomain.com)'
@@ -67,7 +69,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'lol5s.pipelines.Lol5SPipeline': 300,
+    'lol5s.pipelines.Lol5sESPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
