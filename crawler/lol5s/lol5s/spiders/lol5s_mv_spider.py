@@ -1,6 +1,11 @@
 import scrapy
 import pdb
 import datetime
+import requests
+import re
+
+from urllib import unquote
+from bs4 import BeautifulSoup
 
 class Lol5sTV(scrapy.Spider):
     name = 'lol5s_mv'
@@ -47,6 +52,7 @@ class Lol5sTV(scrapy.Spider):
         mv_year = infos.css('div > dl:nth-child(2) > dd:nth-child(2)::text').extract_first()
         mv_intro = infos.css('dl:nth-child(3) > dd > p::text').extract_first()
         mv_plist = []
+        mv_real_plist = []
         _plist = response.css('#m3u8 > div > ul > li')
         if _plist:
             for _p in _plist:
@@ -54,6 +60,9 @@ class Lol5sTV(scrapy.Spider):
                 _p_url = _p.css('a::attr(href)').extract_first()
                 _p_url = self.base_url + _p_url
                 mv_plist.append((_p_title,_p_url))
+        if len(mv_plist) > 0:
+            purl1 = mv_plist[0][1]
+            mv_real_plist = self.parse_plist(purl1)
         mv_dlist = []
         _dlist = response.css('#downlist_1 > div.down_list > ul > li')
         if _dlist:
@@ -74,6 +83,7 @@ class Lol5sTV(scrapy.Spider):
         mv['mv_year'] = mv_year
         mv['mv_intro'] = mv_intro
         mv['mv_plist'] = mv_plist
+        mv["mv_real_plist"] = mv_real_plist
         mv['mv_dlist'] = mv_dlist
         mv['surl'] = response.url
         mv['type_code'] = 100 #common movie type
@@ -81,3 +91,23 @@ class Lol5sTV(scrapy.Spider):
         mv["site_id"] = self.site_id
         yield mv
 
+    def parse_plist(self,purl1):
+        req = requests.get(purl1)
+        soup = BeautifulSoup(req.content)
+        scp = soup.select('body > div.heis > div > div > div.col-md-8.col-sm-12.col-xs-12.bg > script') 
+        surl = scp[0]["src"]
+        surl = self.base_url+surl
+        req = requests.get(surl)
+        data = req.content
+        m = re.search(r"mac_url=unescape\('(.*)'",data)
+        if not m:
+            return None
+        plist_str = m.group(1)
+        plist_str = unquote(plist_str)
+        plist = plist_str.split('#')
+        lst = []
+        for p in plist:
+            rds = p.split("$")
+            name = rds[0].replace("%","\\").decode("unicode_escape")
+            lst.append((name,rds[1]))
+        return lst

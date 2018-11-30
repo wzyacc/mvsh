@@ -4,6 +4,7 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
+import pdb
 import pymongo
 import hashlib
 from elasticsearch import Elasticsearch
@@ -73,10 +74,10 @@ class Lol5sESPipeline(object):
         except Exception as e:
             old_item = None
             print e
-
         if not old_item:
             self.es.index(index=self.es_index, doc_type=self.doc_type, id=_id,body=item)
             return item
+        old_item = old_item["_source"]
         if item["name"] != old_item["name"] or len(item["mv_plist"]) != len(old_item["mv_plist"]):
             self.es.update(index=self.es_index, doc_type=self.doc_type, id=_id,body=item)
         return None
