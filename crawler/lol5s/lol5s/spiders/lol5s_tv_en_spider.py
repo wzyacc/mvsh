@@ -2,8 +2,22 @@ import scrapy
 import pdb
 import datetime
 
-class Lol5sTVEN(scrapy.Spider):
+from lol5s_base_spider import Lol5sBase
+
+class Lol5sTVEN(Lol5sBase):
     name = 'lol5s_tv_en'
+    base_url = 'https://www.lol5s.com/'
+    site_id = 1801
+    type_code = 220 #en tv
+    def start_requests(self):
+        urls = [
+                'https://www.lol5s.com/tv/45.html',
+            ]
+        for url in urls:
+            yield scrapy.Request(url=url,callback=self.parse)
+
+class Lol5sTVENOld(scrapy.Spider):
+    name = 'lol5s_tv_en_old'
     base_url = 'https://www.lol5s.com/'
     site_id = 1801
     type_code = 220 #en tv

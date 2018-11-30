@@ -7,8 +7,21 @@ import re
 from urllib import unquote
 from bs4 import BeautifulSoup
 
-class Lol5sTV(scrapy.Spider):
+from lol5s_base_spider import Lol5sBase
+
+class Lol5sMV(Lol5sBase):
     name = 'lol5s_mv'
+    type_code = 100
+    def start_requests(self):
+        urls = [
+                'https://www.lol5s.com/tv/2.html',
+            ]
+        for url in urls:
+            yield scrapy.Request(url=url,callback=self.parse)
+
+
+class Lol5sMVOld(scrapy.Spider):
+    name = 'lol5s_mv_old'
     base_url = 'https://www.lol5s.com/'
     site_id = 1801
     def start_requests(self):
