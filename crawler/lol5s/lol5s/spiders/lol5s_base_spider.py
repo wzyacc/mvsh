@@ -55,6 +55,8 @@ class Lol5sBase(scrapy.Spider):
         mv_plist = []
         mv_real_plist = []
         _plist = response.css('#m3u8 > div > ul > li')
+        if not _plist or len(_plist) == 0:
+            _plist = response.css('.labe2.cur')
         if _plist:
             for _p in _plist:
                 _p_title = _p.css('a::text').extract_first()
