@@ -74,6 +74,7 @@ class Lol5sESPipeline(object):
         except Exception as e:
             old_item = None
             print e
+        
         if not old_item:
             self.es.index(index=self.es_index, doc_type=self.doc_type, id=_id,body=item)
             return item
