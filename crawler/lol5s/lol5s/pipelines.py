@@ -79,7 +79,7 @@ class Lol5sESPipeline(object):
             self.es.index(index=self.es_index, doc_type=self.doc_type, id=_id,body=item)
             return item
         old_item = old_item["_source"]
-        if item["name"] != old_item["name"] or len(item["mv_plist"]) > len(old_item["mv_plist"]):
+        if item["name"] != old_item["name"] or len(item["mv_plist"]) > len(old_item["mv_plist"]) or len(item["mv_dlist"]) > len(old_item["mv_dlist"]):
             try:
                 self.es.update(index=self.es_index, doc_type=self.doc_type, id=_id,body=item)
             except Exception as e:

@@ -74,7 +74,7 @@ class Lol5sBase(scrapy.Spider):
                 _d_url = _d.css('input::attr(value)').extract_first()
                 mv_dlist.append((_d_title,_d_url))
         mv_img = response.css('body > div:nth-child(4) > div.color > div:nth-child(4) > div.col-md-3.col-xs-5.ct.m-padding-right > img::attr(data-original)').extract_first()
-        if not mv_img.starts_with("http"):
+        if not mv_img.startswith("http"):
             mv_img = 'https:'+mv_img
         mv = {}
         mv['name'] = name

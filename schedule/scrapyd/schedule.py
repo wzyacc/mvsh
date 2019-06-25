@@ -37,6 +37,7 @@ def parse_need_run_spiders(project,spider_schedules):
         end_t = sp_last_finished.get(sp_name,None)
         if not end_t:
             yield project,sp_name
+            continue
         gap = spider_schedules[sp_name]
         now_t = datetime.datetime.now()
         if now_t > end_t + datetime.timedelta(seconds=gap):
