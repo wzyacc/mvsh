@@ -57,7 +57,7 @@ class Lol5sESPipeline(object):
             )
 
     def open_spider(self,spider):
-        self.es = Elasticsearch()
+        self.es = Elasticsearch(self.es_uri)
     
     def close_spider(self,spider):
         #self.es.close()
