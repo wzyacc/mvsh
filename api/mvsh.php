@@ -9,14 +9,18 @@ $client = ClientBuilder::create()->setHosts($host)->build();
 
 $q = $_GET["q"];
 
+$sq = "";
+for($i=0;$i<strlen($q);$i++){
+   $sq .= $q[$i]." ";
+}
 
 $params = [
     'index' => 'yse8',
     'type' => 'mv_records',
     'body' => [
         'query' => [
-            'match' => [
-                'name_pinyin' => $q
+            'match_phrase' => [
+                'name_pinyin' => $sq
             ]
         ]
     ]
